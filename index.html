@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
 
     <!-- ========================================== -->
     <!-- 1. FORMULAIRE D'AUTHENTIFICATION -->
@@ -30,13 +30,13 @@
                 <input type="password" id="auth-password" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
             </div>
 
-            <button type="submit" id="auth-submit-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition">
+            <button type="submit" id="auth-submit-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition cursor-pointer">
                 Se Connecter
             </button>
         </form>
 
         <div class="mt-4 text-center">
-            <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-gray-400 hover:text-yellow-400 underline">
+            <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-gray-400 hover:text-yellow-400 underline cursor-pointer">
                 Pas encore de compte ? S'inscrire
             </button>
         </div>
@@ -44,68 +44,71 @@
 
 
     <!-- ========================================== -->
-    <!-- 2. APPLICATION PRINCIPALE -->
+    <!-- 2. APPLICATION PRINCIPALE (RESPONSIVE) -->
     <!-- ========================================== -->
-    <div id="dashboard-card" class="hidden max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6 relative overflow-hidden">
+    <div id="dashboard-card" class="hidden w-full max-w-md md:max-w-4xl bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8 border border-gray-700 space-y-6 relative overflow-hidden">
         
-        <!-- BARRE DE NAVIGATION SUPÉRIEURE -->
+        <!-- BARRE DE NAVIGATION -->
         <div class="flex items-center justify-between border-b border-gray-700 pb-4">
             <div class="flex items-center gap-3">
-                <button onclick="toggleMenu()" class="p-2 text-gray-300 hover:text-yellow-400 focus:outline-none">
+                <!-- Bouton Menu Mobile -->
+                <button onclick="toggleMenu()" class="md:hidden p-2 text-gray-300 hover:text-yellow-400 focus:outline-none cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
-                <h1 class="text-xl font-bold text-yellow-400">🐕 DogeMiner</h1>
+                <h1 class="text-xl md:text-2xl font-bold text-yellow-400">🐕 DogeMiner</h1>
             </div>
-            <span class="inline-flex items-center gap-1 text-[10px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20">
+
+            <!-- Navigation Desktop (Cachée sur mobile) -->
+            <div class="hidden md:flex items-center gap-2">
+                <button onclick="showPage('page-mining')" class="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">⛏️ Tableau de Bord</button>
+                <button onclick="showPage('page-plans')" class="px-3 py-1.5 text-sm text-yellow-400 hover:text-yellow-300 rounded-lg hover:bg-gray-700/50 font-semibold transition cursor-pointer">⚡ Booster</button>
+                <button onclick="showPage('page-referral')" class="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">🤝 Affiliation</button>
+                <button onclick="logout()" class="px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition cursor-pointer">🚪 Déconnexion</button>
+            </div>
+
+            <span class="inline-flex items-center gap-1 text-[10px] md:text-xs bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20">
                 <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> Actif
             </span>
         </div>
 
-        <!-- MENU LATÉRAL DEROULANT -->
-        <div id="side-menu" class="hidden absolute top-16 left-0 w-full bg-gray-800/95 backdrop-blur-md border-b border-gray-700 p-4 space-y-2 z-50 shadow-2xl">
-            <button onclick="showPage('page-mining')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">
-                ⛏️ Tableau de Bord (Minage)
-            </button>
-            <button onclick="showPage('page-plans')" class="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-gray-700/60 rounded-lg flex items-center gap-2 font-semibold">
-                ⚡ Booster de Minage (Acheter)
-            </button>
-            <button onclick="showPage('page-referral')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">
-                🤝 Programme d'Affiliation
-            </button>
+        <!-- MENU LATÉRAL DROPDOWN (MOBILE UNIQUEMENT) -->
+        <div id="side-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-gray-800/95 backdrop-blur-md border-b border-gray-700 p-4 space-y-2 z-50 shadow-2xl">
+            <button onclick="showPage('page-mining')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">⛏️ Tableau de Bord (Minage)</button>
+            <button onclick="showPage('page-plans')" class="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-gray-700/60 rounded-lg flex items-center gap-2 font-semibold">⚡ Booster de Minage</button>
+            <button onclick="showPage('page-referral')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">🤝 Programme d'Affiliation</button>
             <hr class="border-gray-700 my-2">
-            <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2">
-                🚪 Déconnexion
-            </button>
+            <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2">🚪 Déconnexion</button>
         </div>
 
         <!-- PAGE 1 : MINAGE -->
         <div id="page-mining" class="page-content space-y-6">
-            <div class="space-y-3">
-                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
-                    <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
-                    <div id="balance" class="text-3xl font-extrabold text-yellow-400 font-mono">0.000000</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-3 bg-gray-900/60 p-4 md:p-6 rounded-xl border border-gray-700/50 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
+                        <div id="balance" class="text-3xl md:text-4xl font-extrabold text-yellow-400 font-mono">0.000000</div>
+                    </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
-                        <p class="text-xs text-gray-400 mb-1">Puissance</p>
-                        <p class="text-lg font-bold text-white"><span id="hashrate">15.5</span> MH/s</p>
-                    </div>
-                    <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
-                        <p class="text-xs text-gray-400 mb-1">Gain / sec</p>
-                        <p class="text-lg font-bold text-white"><span id="rate">0.000155</span></p>
-                    </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                    <p class="text-xs text-gray-400 mb-1">Puissance de Hachage</p>
+                    <p class="text-lg md:text-xl font-bold text-white"><span id="hashrate">15.5</span> MH/s</p>
+                </div>
+                
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50 md:col-span-2">
+                    <p class="text-xs text-gray-400 mb-1">Rendement estimé / sec</p>
+                    <p class="text-lg md:text-xl font-bold text-white"><span id="rate">0.000155</span> DOGE</p>
                 </div>
             </div>
 
-            <div class="border-t border-gray-700 pt-4">
-                <h2 class="text-sm font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
-                <form onsubmit="handleWithdraw(event)" class="space-y-3">
+            <div class="border-t border-gray-700 pt-6">
+                <h2 class="text-base font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
+                <form onsubmit="handleWithdraw(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
                     <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
-                    <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition">Retirer mes DOGE</button>
+                    <button type="submit" class="md:col-span-2 w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2.5 rounded-lg transition cursor-pointer">Retirer mes DOGE</button>
                 </form>
                 <p id="withdraw-msg" class="text-xs mt-2 text-center min-h-[16px]"></p>
             </div>
@@ -113,36 +116,38 @@
 
         <!-- PAGE 2 : ACHAT DE MINAGE -->
         <div id="page-plans" class="page-content hidden space-y-4">
-            <h2 class="text-base font-bold text-yellow-400">🚀 Augmenter votre Puissance</h2>
-            <p class="text-xs text-gray-400">Achetez de la puissance de calcul supplémentaire pour miner plus vite.</p>
+            <div>
+                <h2 class="text-lg font-bold text-yellow-400">🚀 Augmenter votre Puissance</h2>
+                <p class="text-xs text-gray-400">Achetez de la puissance de calcul supplémentaire pour miner plus vite.</p>
+            </div>
 
-            <div class="space-y-3">
-                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex flex-col justify-between space-y-4">
                     <div>
-                        <p class="font-bold text-sm text-white">Pack STARTER</p>
-                        <p class="text-xs text-yellow-400">+50 MH/s de puissance</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Prix: 50 DOGE (~ $8)</p>
+                        <p class="font-bold text-base text-white">Pack STARTER</p>
+                        <p class="text-sm text-yellow-400 mt-1">+50 MH/s</p>
+                        <p class="text-xs text-gray-400 mt-2">Prix: 50 DOGE (~ $8)</p>
                     </div>
-                    <button onclick="buyPlan(50, 50)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Acheter</button>
+                    <button onclick="buyPlan(50, 50)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2 rounded-lg transition cursor-pointer">Acheter</button>
                 </div>
 
-                <div class="bg-gray-900/60 p-4 rounded-xl border border-yellow-500/50 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-yellow-500/50 flex flex-col justify-between space-y-4 relative overflow-hidden">
                     <span class="absolute top-0 right-0 bg-yellow-500 text-gray-900 text-[8px] font-black px-2 py-0.5 rounded-bl">POPULAIRE</span>
                     <div>
-                        <p class="font-bold text-sm text-white">Pack PRO MINER</p>
-                        <p class="text-xs text-yellow-400">+200 MH/s de puissance</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Prix: 180 DOGE (~ $28)</p>
+                        <p class="font-bold text-base text-white">Pack PRO MINER</p>
+                        <p class="text-sm text-yellow-400 mt-1">+200 MH/s</p>
+                        <p class="text-xs text-gray-400 mt-2">Prix: 180 DOGE (~ $28)</p>
                     </div>
-                    <button onclick="buyPlan(200, 180)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Acheter</button>
+                    <button onclick="buyPlan(200, 180)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2 rounded-lg transition cursor-pointer">Acheter</button>
                 </div>
 
-                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex flex-col justify-between space-y-4">
                     <div>
-                        <p class="font-bold text-sm text-white">Pack RIG VIP</p>
-                        <p class="text-xs text-yellow-400">+1000 MH/s de puissance</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Prix: 800 DOGE (~ $120)</p>
+                        <p class="font-bold text-base text-white">Pack RIG VIP</p>
+                        <p class="text-sm text-yellow-400 mt-1">+1000 MH/s</p>
+                        <p class="text-xs text-gray-400 mt-2">Prix: 800 DOGE (~ $120)</p>
                     </div>
-                    <button onclick="buyPlan(1000, 800)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Acheter</button>
+                    <button onclick="buyPlan(1000, 800)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2 rounded-lg transition cursor-pointer">Acheter</button>
                 </div>
             </div>
             <p id="plan-msg" class="text-xs text-center min-h-[16px]"></p>
@@ -150,25 +155,27 @@
 
         <!-- PAGE 3 : AFFILIATION -->
         <div id="page-referral" class="page-content hidden space-y-4">
-            <h2 class="text-base font-bold text-yellow-400">🤝 Programme d'Affiliation</h2>
-            <p class="text-xs text-gray-400">Invitez vos amis et recevez un bonus permanent de 10% sur toute la puissance qu'ils accumulent.</p>
+            <div>
+                <h2 class="text-lg font-bold text-yellow-400">🤝 Programme d'Affiliation</h2>
+                <p class="text-xs text-gray-400">Invitez vos amis et recevez un bonus permanent de 10% sur toute la puissance qu'ils accumulent.</p>
+            </div>
 
             <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50 space-y-3">
                 <label class="block text-xs text-gray-400">Votre Lien d'Affiliation Unique :</label>
                 <div class="flex gap-2">
                     <input type="text" id="ref-link" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none">
-                    <button onclick="copyRefLink()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Copier</button>
+                    <button onclick="copyRefLink()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-4 py-2 rounded-lg transition cursor-pointer">Copier</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50 text-center">
-                    <p class="text-[10px] text-gray-400">Filleuls Inscrits</p>
-                    <p id="ref-count" class="text-xl font-bold text-white mt-1">0</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50 text-center">
+                    <p class="text-xs text-gray-400">Filleuls Inscrits</p>
+                    <p id="ref-count" class="text-2xl font-bold text-white mt-1">0</p>
                 </div>
-                <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50 text-center">
-                    <p class="text-[10px] text-gray-400">Gains Affiliation</p>
-                    <p id="ref-earnings" class="text-xl font-bold text-yellow-400 mt-1">+0 MH/s</p>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50 text-center">
+                    <p class="text-xs text-gray-400">Gains Affiliation</p>
+                    <p id="ref-earnings" class="text-2xl font-bold text-yellow-400 mt-1">+0 MH/s</p>
                 </div>
             </div>
         </div>
@@ -190,10 +197,8 @@
         let balance = 10.0;
         let hashrate = 15.5;
 
-        // BASCOULER ENTRE CONNEXION ET INSCRIPTION
         function toggleAuthMode() {
             isSignUp = !isSignUp;
-            
             const subtitle = document.getElementById('auth-subtitle');
             const submitBtn = document.getElementById('auth-submit-btn');
             const toggleBtn = document.getElementById('auth-toggle-btn');
@@ -212,7 +217,6 @@
             }
         }
 
-        // GESTION DE LA SOUMISSION DU FORMULAIRE
         async function handleAuth(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
@@ -257,7 +261,6 @@
             }
         }
 
-        // CHARGEMENT DU TABLEAU DE BORD
         async function loadUserData() {
             const { data } = await supabaseClient
                 .from('profiles')
@@ -278,7 +281,6 @@
             setInterval(saveToCloud, 5000);
         }
 
-        // CALCUL DU MINAGE EN DIRECT
         function updateMining() {
             const ratePerSec = hashrate * 0.00001;
             balance += ratePerSec / 10;
@@ -288,14 +290,12 @@
             document.getElementById('rate').innerText = ratePerSec.toFixed(6);
         }
 
-        // SAUVEGARDE EN BASE DE DONNÉES
         async function saveToCloud() {
             if (currentUser && supabaseClient) {
                 await supabaseClient.from('profiles').update({ balance, hashrate }).eq('id', currentUser.id);
             }
         }
 
-        // NAVIGATION MENU BURGER ET PAGES
         function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('hidden');
         }
@@ -333,7 +333,6 @@
             alert("Lien d'affiliation copié !");
         }
 
-        // DÉCONNEXION
         async function logout() {
             if (supabaseClient) await supabaseClient.auth.signOut();
             location.reload();
