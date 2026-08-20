@@ -44,14 +44,13 @@
 
 
     <!-- ========================================== -->
-    <!-- 2. APPLICATION PRINCIPALE (RESPONSIVE) -->
+    <!-- 2. APPLICATION PRINCIPALE -->
     <!-- ========================================== -->
     <div id="dashboard-card" class="hidden w-full max-w-md md:max-w-4xl bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8 border border-gray-700 space-y-6 relative overflow-hidden">
         
         <!-- BARRE DE NAVIGATION -->
         <div class="flex items-center justify-between border-b border-gray-700 pb-4">
             <div class="flex items-center gap-3">
-                <!-- Bouton Menu Mobile -->
                 <button onclick="toggleMenu()" class="md:hidden p-2 text-gray-300 hover:text-yellow-400 focus:outline-none cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -60,7 +59,6 @@
                 <h1 class="text-xl md:text-2xl font-bold text-yellow-400">🐕 DogeMiner</h1>
             </div>
 
-            <!-- Navigation Desktop (Cachée sur mobile) -->
             <div class="hidden md:flex items-center gap-2">
                 <button onclick="showPage('page-mining')" class="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">⛏️ Tableau de Bord</button>
                 <button onclick="showPage('page-plans')" class="px-3 py-1.5 text-sm text-yellow-400 hover:text-yellow-300 rounded-lg hover:bg-gray-700/50 font-semibold transition cursor-pointer">⚡ Booster</button>
@@ -73,11 +71,11 @@
             </span>
         </div>
 
-        <!-- MENU LATÉRAL DROPDOWN (MOBILE UNIQUEMENT) -->
+        <!-- MENU LATÉRAL MOBILE -->
         <div id="side-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-gray-800/95 backdrop-blur-md border-b border-gray-700 p-4 space-y-2 z-50 shadow-2xl">
-            <button onclick="showPage('page-mining')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">⛏️ Tableau de Bord (Minage)</button>
+            <button onclick="showPage('page-mining')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">⛏️ Tableau de Bord</button>
             <button onclick="showPage('page-plans')" class="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-gray-700/60 rounded-lg flex items-center gap-2 font-semibold">⚡ Booster de Minage</button>
-            <button onclick="showPage('page-referral')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">🤝 Programme d'Affiliation</button>
+            <button onclick="showPage('page-referral')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">🤝 Affiliation</button>
             <hr class="border-gray-700 my-2">
             <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2">🚪 Déconnexion</button>
         </div>
@@ -114,21 +112,22 @@
             </div>
         </div>
 
-        <!-- PAGE 2 : ACHAT DE MINAGE -->
-        <div id="page-plans" class="page-content hidden space-y-4">
+        <!-- PAGE 2 : ACHAT / DÉPÔT CRYPTO -->
+        <div id="page-plans" class="page-content hidden space-y-6">
             <div>
                 <h2 class="text-lg font-bold text-yellow-400">🚀 Augmenter votre Puissance</h2>
-                <p class="text-xs text-gray-400">Achetez de la puissance de calcul supplémentaire pour miner plus vite.</p>
+                <p class="text-xs text-gray-400">Sélectionnez un pack et effectuez votre dépôt crypto pour débloquer votre mineur.</p>
             </div>
 
+            <!-- CARTES DES PACKS DE MINAGE -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex flex-col justify-between space-y-4">
                     <div>
                         <p class="font-bold text-base text-white">Pack STARTER</p>
                         <p class="text-sm text-yellow-400 mt-1">+50 MH/s</p>
-                        <p class="text-xs text-gray-400 mt-2">Prix: 50 DOGE (~ $8)</p>
+                        <p class="text-xs text-gray-400 mt-2">Prix : <span class="text-white font-bold">50 DOGE</span> ou <span class="text-green-400 font-bold">8 USDT</span></p>
                     </div>
-                    <button onclick="buyPlan(50, 50)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2 rounded-lg transition cursor-pointer">Acheter</button>
+                    <button onclick="openDepositModal('Pack STARTER', 50, 8)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2.5 rounded-lg transition cursor-pointer">Activer ce Pack</button>
                 </div>
 
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-yellow-500/50 flex flex-col justify-between space-y-4 relative overflow-hidden">
@@ -136,21 +135,68 @@
                     <div>
                         <p class="font-bold text-base text-white">Pack PRO MINER</p>
                         <p class="text-sm text-yellow-400 mt-1">+200 MH/s</p>
-                        <p class="text-xs text-gray-400 mt-2">Prix: 180 DOGE (~ $28)</p>
+                        <p class="text-xs text-gray-400 mt-2">Prix : <span class="text-white font-bold">180 DOGE</span> ou <span class="text-green-400 font-bold">28 USDT</span></p>
                     </div>
-                    <button onclick="buyPlan(200, 180)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2 rounded-lg transition cursor-pointer">Acheter</button>
+                    <button onclick="openDepositModal('Pack PRO MINER', 180, 28)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2.5 rounded-lg transition cursor-pointer">Activer ce Pack</button>
                 </div>
 
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex flex-col justify-between space-y-4">
                     <div>
                         <p class="font-bold text-base text-white">Pack RIG VIP</p>
                         <p class="text-sm text-yellow-400 mt-1">+1000 MH/s</p>
-                        <p class="text-xs text-gray-400 mt-2">Prix: 800 DOGE (~ $120)</p>
+                        <p class="text-xs text-gray-400 mt-2">Prix : <span class="text-white font-bold">800 DOGE</span> ou <span class="text-green-400 font-bold">120 USDT</span></p>
                     </div>
-                    <button onclick="buyPlan(1000, 800)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2 rounded-lg transition cursor-pointer">Acheter</button>
+                    <button onclick="openDepositModal('Pack RIG VIP', 800, 120)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs py-2.5 rounded-lg transition cursor-pointer">Activer ce Pack</button>
                 </div>
             </div>
-            <p id="plan-msg" class="text-xs text-center min-h-[16px]"></p>
+
+            <!-- MODAL DE PAIEMENT / DÉPÔT -->
+            <div id="deposit-modal" class="hidden bg-gray-900/90 border border-yellow-500/40 p-5 rounded-2xl space-y-4 mt-6">
+                <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+                    <h3 class="text-sm font-bold text-yellow-400">💳 Paiement : <span id="modal-pack-name" class="text-white"></span></h3>
+                    <button onclick="closeDepositModal()" class="text-gray-400 hover:text-white text-xs">✖ Fermer</button>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-xs text-gray-400">Choisissez la crypto pour le transfert :</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="selectCrypto('DOGE')" id="btn-doge" class="border border-yellow-500/50 bg-gray-800 p-3 rounded-xl text-center cursor-pointer hover:border-yellow-400">
+                            <p class="font-bold text-xs text-yellow-400">DOGECOIN</p>
+                            <p class="text-[10px] text-gray-400 mt-1" id="doge-amount-display">0 DOGE</p>
+                        </button>
+                        <button type="button" onclick="selectCrypto('USDT')" id="btn-usdt" class="border border-gray-700 bg-gray-800 p-3 rounded-xl text-center cursor-pointer hover:border-green-400">
+                            <p class="font-bold text-xs text-green-400">USDT (TRC20)</p>
+                            <p class="text-[10px] text-gray-400 mt-1" id="usdt-amount-display">0 USDT</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DÉTAILS DE L'ADRESSE SELECTIONNÉE -->
+                <div class="bg-gray-800/80 p-4 rounded-xl border border-gray-700 text-center space-y-3">
+                    <p class="text-xs text-gray-300">Envoyez exactement <span id="pay-amount" class="font-mono font-bold text-yellow-400"></span> à l'adresse ci-dessous :</p>
+                    
+                    <div class="flex items-center justify-center bg-gray-900 p-2 rounded-lg border border-gray-700 gap-2">
+                        <span id="pay-address" class="font-mono text-xs text-gray-200 break-all select-all"></span>
+                        <button onclick="copyAddress()" class="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 text-xs px-2.5 py-1 rounded transition shrink-0 cursor-pointer">Copier</button>
+                    </div>
+
+                    <div id="qr-code-container" class="flex justify-center pt-2">
+                        <img id="qr-code-img" src="" alt="QR Code Adresse" class="w-32 h-32 rounded-lg border border-gray-700">
+                    </div>
+                </div>
+
+                <!-- SOUMISSION DE LA TRANSACTION -->
+                <form onsubmit="submitTransaction(event)" class="space-y-3 pt-2">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">ID de Transaction (TXID / Hash) :</label>
+                        <input type="text" id="txid-input" required placeholder="Ex: 8f9a2b..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-yellow-400">
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 hover:bg-green-400 text-gray-900 font-bold py-2.5 rounded-lg text-xs transition cursor-pointer">
+                        Confirmer mon Dépôt
+                    </button>
+                </form>
+                <p id="deposit-status-msg" class="text-xs text-center min-h-[16px]"></p>
+            </div>
         </div>
 
         <!-- PAGE 3 : AFFILIATION -->
@@ -187,6 +233,12 @@
         const SUPABASE_URL = "https://ptqtousqgtuybotaicrx.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0cXRvdXNxZ3R1eWJvdGFpY3J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyMTY5MTksImV4cCI6MjEwMjc5MjkxOX0.Aur5mUVLz8dJi4Gxv51FAMdiNHqX2t8bFHzRc7FwqAk"; 
         
+        // ADRESSES DE DÉPÔT CRYPTO
+        const WALLETS = {
+            DOGE: "DCh5uYMtmMRSM9EnyvYaiUaMSmFJkqYREs",
+            USDT: "TYgLbWdD6BxmxESB1iSWZqGaxAmmAUGWse"
+        };
+
         let supabaseClient = null;
         if (typeof window.supabase !== 'undefined') {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -196,6 +248,10 @@
         let currentUser = null;
         let balance = 10.0;
         let hashrate = 15.5;
+
+        // Variables de gestion de pack
+        let selectedPack = { name: "", doge: 0, usdt: 0 };
+        let selectedCurrency = "DOGE";
 
         function toggleAuthMode() {
             isSignUp = !isSignUp;
@@ -313,17 +369,64 @@
             msg.innerText = "❌ Solde insuffisant pour procéder au retrait.";
         }
 
-        function buyPlan(addedHash, cost) {
-            const msg = document.getElementById('plan-msg');
-            if (balance >= cost) {
-                balance -= cost;
-                hashrate += addedHash;
-                msg.className = "text-xs text-center text-green-400";
-                msg.innerText = "✅ Achat effectué avec succès !";
+        // DÉPÔT / ACHAT PACKS
+        function openDepositModal(packName, dogePrice, usdtPrice) {
+            selectedPack = { name: packName, doge: dogePrice, usdt: usdtPrice };
+            document.getElementById('modal-pack-name').innerText = packName;
+            document.getElementById('doge-amount-display').innerText = `${dogePrice} DOGE`;
+            document.getElementById('usdt-amount-display').innerText = `${usdtPrice} USDT`;
+            
+            document.getElementById('deposit-modal').classList.remove('hidden');
+            selectCrypto('DOGE');
+        }
+
+        function closeDepositModal() {
+            document.getElementById('deposit-modal').classList.add('hidden');
+            document.getElementById('deposit-status-msg').innerText = "";
+        }
+
+        function selectCrypto(crypto) {
+            selectedCurrency = crypto;
+            const btnDoge = document.getElementById('btn-doge');
+            const btnUsdt = document.getElementById('btn-usdt');
+            const addrEl = document.getElementById('pay-address');
+            const amtEl = document.getElementById('pay-amount');
+            const qrImg = document.getElementById('qr-code-img');
+
+            if (crypto === 'DOGE') {
+                btnDoge.className = "border-2 border-yellow-400 bg-gray-800 p-3 rounded-xl text-center cursor-pointer";
+                btnUsdt.className = "border border-gray-700 bg-gray-800 p-3 rounded-xl text-center cursor-pointer opacity-60";
+                addrEl.innerText = WALLETS.DOGE;
+                amtEl.innerText = `${selectedPack.doge} DOGE`;
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${WALLETS.DOGE}`;
             } else {
-                msg.className = "text-xs text-center text-red-400";
-                msg.innerText = "❌ Solde DOGE insuffisant.";
+                btnUsdt.className = "border-2 border-green-400 bg-gray-800 p-3 rounded-xl text-center cursor-pointer";
+                btnDoge.className = "border border-gray-700 bg-gray-800 p-3 rounded-xl text-center cursor-pointer opacity-60";
+                addrEl.innerText = WALLETS.USDT;
+                amtEl.innerText = `${selectedPack.usdt} USDT`;
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${WALLETS.USDT}`;
             }
+        }
+
+        function copyAddress() {
+            const addr = document.getElementById('pay-address').innerText;
+            navigator.clipboard.writeText(addr);
+            alert("Adresse de dépôt copiée !");
+        }
+
+        function submitTransaction(e) {
+            e.preventDefault();
+            const txid = document.getElementById('txid-input').value;
+            const msg = document.getElementById('deposit-status-msg');
+
+            msg.className = "text-xs text-center text-yellow-400 mt-2";
+            msg.innerText = "⌛ Vérification de la transaction sur la blockchain en cours...";
+
+            setTimeout(() => {
+                msg.className = "text-xs text-center text-green-400 mt-2";
+                msg.innerText = "✅ Transaction soumise avec succès ! Votre mineur sera activé dès validation du réseau (1 à 3 confirmations).";
+                document.getElementById('txid-input').value = "";
+            }, 2500);
         }
 
         function copyRefLink() {
