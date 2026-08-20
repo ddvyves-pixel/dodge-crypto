@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DogeMiner - Minage en Ligne</title>
-    <!-- Tailwind CSS via CDN -->
+    <title>DogeMiner - Minage & Tâches</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
+    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6">
         <!-- En-tête -->
-        <div class="flex items-center justify-between border-b border-gray-700 pb-4 mb-6">
+        <div class="flex items-center justify-between border-b border-gray-700 pb-4">
             <h1 class="text-2xl font-bold text-yellow-400 flex items-center gap-2">
                 🐕 DogeMiner
             </h1>
-            <span id="status-badge" class="inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-400 px-3 py-1 rounded-full border border-green-500/20">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> Actif
+            <span class="inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-400 px-3 py-1 rounded-full border border-green-500/20">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> En ligne
             </span>
         </div>
 
         <!-- Statistiques de Minage -->
-        <div class="space-y-4 mb-6">
+        <div class="space-y-3">
             <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
                 <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
                 <div id="balance" class="text-3xl font-extrabold text-yellow-400 font-mono">0.000000</div>
@@ -39,9 +38,46 @@
             </div>
         </div>
 
-        <!-- Section Retrait -->
+        <!-- Section 1 : Tâches & Bonus -->
         <div class="border-t border-gray-700 pt-4">
-            <h2 class="text-sm font-semibold mb-3 text-gray-300">Demander un Retrait</h2>
+            <h2 class="text-sm font-semibold mb-3 text-gray-300">⚡ Tâches & Bonus de Puissance</h2>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between bg-gray-900/40 p-3 rounded-lg border border-gray-700/40">
+                    <div>
+                        <p class="text-xs font-bold text-white">Abonnement X (Twitter)</p>
+                        <p class="text-[10px] text-gray-400">+2.5 MH/s permanent</p>
+                    </div>
+                    <button id="task-1-btn" onclick="completeTask(1, 2.5)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1.5 rounded transition">
+                        Réclamer
+                    </button>
+                </div>
+                <div class="flex items-center justify-between bg-gray-900/40 p-3 rounded-lg border border-gray-700/40">
+                    <div>
+                        <p class="text-xs font-bold text-white">Rejoindre le Telegram</p>
+                        <p class="text-[10px] text-gray-400">+5.0 MH/s permanent</p>
+                    </div>
+                    <button id="task-2-btn" onclick="completeTask(2, 5.0)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1.5 rounded transition">
+                        Réclamer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2 : Programme d'Affiliation -->
+        <div class="border-t border-gray-700 pt-4">
+            <h2 class="text-sm font-semibold mb-2 text-gray-300">🤝 Programme de Parrainage</h2>
+            <p class="text-[11px] text-gray-400 mb-3">Partagez votre lien et gagnez 10% de bonus de puissance sur vos filleuls !</p>
+            <div class="flex gap-2">
+                <input type="text" id="ref-link" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 focus:outline-none">
+                <button onclick="copyRefLink()" class="bg-gray-700 hover:bg-gray-600 text-xs font-bold px-3 py-1.5 rounded text-white transition">
+                    Copier
+                </button>
+            </div>
+        </div>
+
+        <!-- Section 3 : Retrait -->
+        <div class="border-t border-gray-700 pt-4">
+            <h2 class="text-sm font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
             <form id="withdraw-form" onsubmit="handleWithdraw(event)" class="space-y-3">
                 <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
                 <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
@@ -49,60 +85,98 @@
                     Retirer mes DOGE
                 </button>
             </form>
-            <p id="message" class="text-xs mt-3 text-center min-h-[16px]"></p>
+            <p id="message" class="text-xs mt-2 text-center min-h-[16px]"></p>
         </div>
     </div>
 
-    <!-- Script de logique de minage intégrée -->
     <script>
-        // Configuration de départ
-        const HASHRATE = 15.5; // MH/s
-        const RATE_PER_SECOND = 0.000155; // DOGE par seconde
-        
-        // Charger ou initialiser le solde depuis le LocalStorage du navigateur
+        // --- INITIALISATION DES DONNÉES ---
+        let userId = localStorage.getItem('doge_user_id') || 'usr_' + Math.random().toString(36).substring(2, 9);
+        localStorage.setItem('doge_user_id', userId);
+
+        let hashrate = parseFloat(localStorage.getItem('doge_hashrate')) || 15.5;
         let balance = parseFloat(localStorage.getItem('doge_balance')) || 10.000000;
         let lastUpdate = parseInt(localStorage.getItem('doge_last_update')) || Date.now();
+        let completedTasks = JSON.parse(localStorage.getItem('doge_tasks')) || [];
 
-        // Calculer les gains accumulés hors ligne
+        // Calcul hors-ligne
         const now = Date.now();
         const elapsedSeconds = (now - lastUpdate) / 1000;
-        balance += elapsedSeconds * RATE_PER_SECOND;
+        balance += elapsedSeconds * (hashrate * 0.00001);
 
+        // --- ÉLÉMENTS DOM ---
         const balanceEl = document.getElementById('balance');
+        const hashrateEl = document.getElementById('hashrate');
+        const rateEl = document.getElementById('rate');
+        const refInput = document.getElementById('ref-link');
         const msgEl = document.getElementById('message');
 
-        // Mettre à jour l'affichage et sauvegarder
+        // Générer le lien de parrainage
+        refInput.value = `${window.location.origin}?ref=${userId}`;
+
+        // Mise à jour de la boucle de minage
         function updateMining() {
-            balance += RATE_PER_SECOND / 10;
-            balanceEl.innerText = balance.toFixed(6);
+            const ratePerSec = hashrate * 0.00001;
+            balance += ratePerSec / 10;
             
-            // Sauvegarde dans le navigateur
+            balanceEl.innerText = balance.toFixed(6);
+            hashrateEl.innerText = hashrate.toFixed(1);
+            rateEl.innerText = ratePerSec.toFixed(6);
+
             localStorage.setItem('doge_balance', balance.toString());
+            localStorage.setItem('doge_hashrate', hashrate.toString());
             localStorage.setItem('doge_last_update', Date.now().toString());
         }
 
-        // Mettre à jour le solde toutes les 100ms pour une animation fluide
         setInterval(updateMining, 100);
 
-        // Gestion du formulaire de retrait
+        // --- GESTION DES TÂCHES ---
+        function completeTask(taskId, bonusHashrate) {
+            if (completedTasks.includes(taskId)) return;
+
+            hashrate += bonusHashrate;
+            completedTasks.push(taskId);
+            localStorage.setItem('doge_tasks', JSON.stringify(completedTasks));
+
+            updateTaskUI(taskId);
+        }
+
+        function updateTaskUI(taskId) {
+            const btn = document.getElementById(`task-${taskId}-btn`);
+            if (btn) {
+                btn.innerText = "Complété ✓";
+                btn.disabled = true;
+                btn.className = "bg-gray-700 text-gray-400 text-xs font-bold px-3 py-1.5 rounded cursor-not-allowed";
+            }
+        }
+
+        // Restaurer l'état des tâches complétées au chargement
+        completedTasks.forEach(id => updateTaskUI(id));
+
+        // --- PARRAINAGE ---
+        function copyRefLink() {
+            refInput.select();
+            navigator.clipboard.writeText(refInput.value);
+            alert("Lien d'affiliation copié !");
+        }
+
+        // --- RETRAIT ---
         function handleWithdraw(e) {
             e.preventDefault();
             const wallet = document.getElementById('wallet').value;
             const amount = parseFloat(document.getElementById('amount').value);
 
             if (amount > balance) {
-                msgEl.className = "text-xs mt-3 text-center text-red-400";
+                msgEl.className = "text-xs mt-2 text-center text-red-400";
                 msgEl.innerText = "❌ Solde insuffisant !";
                 return;
             }
 
-            // Déduire le montant du solde
             balance -= amount;
             localStorage.setItem('doge_balance', balance.toString());
             
-            msgEl.className = "text-xs mt-3 text-center text-green-400";
-            msgEl.innerText = `✅ Retrait de ${amount} DOGE vers ${wallet.slice(0, 6)}... en cours !`;
-            
+            msgEl.className = "text-xs mt-2 text-center text-green-400";
+            msgEl.innerText = `✅ Demande de ${amount} DOGE enregistrée !`;
             document.getElementById('withdraw-form').reset();
         }
     </script>
