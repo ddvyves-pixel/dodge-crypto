@@ -192,57 +192,88 @@
 
     </div>
 
-    <!-- LOGIQUE JS -->
+    <!-- LOGIQUE JAVASCRIPT -->
     <script>
-        // CONFIGURATION SUPABASE (Si configuré)
-        const SUPABASE_URL = "https://ptqtousqgtuybotaicrx.supabase.coL";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0cXRvdXNxZ3R1eWJvdGFpY3J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyMTY5MTksImV4cCI6MjEwMjc5MjkxOX0.Aur5mUVLz8dJi4Gxv51FAMdiNHqX2t8bFHzRc7FwqAk";
-        const supabaseClient = (SUPABASE_URL !== "https://ptqtousqgtuybotaicrx.supabase.co") ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+        // Vos clés Supabase
+        const SUPABASE_URL = "https://xxxxxx.supabase.co"; // Remplacez par votre URL Supabase
+        const SUPABASE_KEY = "votre_cle_anon_public";      // Remplacez par votre clé public/anon
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let isSignUp = false;
-        let currentUser = JSON.parse(localStorage.getItem('doge_session')) || null;
+        let currentUser = null;
         let balance = 10.0;
         let hashrate = 15.5;
 
-        // Gestion du Menu Burger
-        function toggleMenu() {
-            const menu = document.getElementById('side-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Navigation entre les pages
-        function showPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
-            document.getElementById('side-menu').classList.add('hidden');
-        }
-
+        // Basculer le mode entre Connexion et Inscription
         function toggleAuthMode() {
             isSignUp = !isSignUp;
             document.getElementById('auth-subtitle').innerText = isSignUp ? "Créer un compte pour commencer" : "Connectez-vous pour commencer à miner";
             document.getElementById('auth-submit-btn').innerText = isSignUp ? "S'inscrire" : "Se Connecter";
             document.getElementById('auth-toggle-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
+            document.getElementById('auth-msg').innerText = "";
         }
 
-        function handleAuth(e) {
+        // Fonction d'inscription et connexion Supabase
+        async function handleAuth(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
-            currentUser = { email: email, id: 'usr_' + Math.random().toString(36).substring(2, 9) };
-            localStorage.setItem('doge_session', JSON.stringify(currentUser));
-            showDashboard();
+            const password = document.getElementById('auth-password').value;
+            const msgEl = document.getElementById('auth-msg');
+
+            msgEl.innerText = "Chargement...";
+
+            if (isSignUp) {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) {
+                    msgEl.className = "text-xs mb-4 text-center text-red-400";
+                    return msgEl.innerText = "❌ " + error.message;
+                }
+
+                if (data.user) {
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([{ id: data.user.id, email: email, balance: 10.0, hashrate: 15.5 }]);
+                    
+                    if (profileError) console.error(profileError);
+
+                    msgEl.className = "text-xs mb-4 text-center text-green-400";
+                    msgEl.innerText = "✅ Compte créé ! Vous pouvez vous connecter.";
+                    toggleAuthMode();
+                }
+            } else {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    msgEl.className = "text-xs mb-4 text-center text-red-400";
+                    return msgEl.innerText = "❌ " + error.message;
+                }
+
+                currentUser = data.user;
+                loadUserData();
+            }
         }
 
-        function showDashboard() {
+        // Charger les données de l'utilisateur depuis Supabase
+        async function loadUserData() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (data) {
+                balance = parseFloat(data.balance);
+                hashrate = parseFloat(data.hashrate);
+            }
+
             document.getElementById('auth-card').classList.add('hidden');
             document.getElementById('dashboard-card').classList.remove('hidden');
             document.getElementById('ref-link').value = `${window.location.origin}?ref=${currentUser.id}`;
 
-            hashrate = parseFloat(localStorage.getItem(`hashrate_${currentUser.email}`)) || 15.5;
-            balance = parseFloat(localStorage.getItem(`balance_${currentUser.email}`)) || 10.000000;
-
             setInterval(updateMining, 100);
+            setInterval(saveToCloud, 5000); // Sauvegarde auto sur Supabase toutes les 5 sec
         }
 
+        // Boucle de calcul du minage en direct
         function updateMining() {
             const ratePerSec = hashrate * 0.00001;
             balance += ratePerSec / 10;
@@ -250,56 +281,30 @@
             document.getElementById('balance').innerText = balance.toFixed(6);
             document.getElementById('hashrate').innerText = hashrate.toFixed(1);
             document.getElementById('rate').innerText = ratePerSec.toFixed(6);
-
-            localStorage.setItem(`balance_${currentUser.email}`, balance.toString());
-            localStorage.setItem(`hashrate_${currentUser.email}`, hashrate.toString());
         }
 
-        function buyPlan(addedHashrate, cost) {
-            const msgEl = document.getElementById('plan-msg');
-            if (balance < cost) {
-                msgEl.className = "text-xs text-center text-red-400";
-                msgEl.innerText = `❌ Solde insuffisant (${cost} DOGE requis). Minez davantage ou déposez des fonds.`;
-                return;
+        // Enregistrer la progression dans la base de données
+        async function saveToCloud() {
+            if (currentUser) {
+                await supabase.from('profiles').update({ balance, hashrate }).eq('id', currentUser.id);
             }
-
-            balance -= cost;
-            hashrate += addedHashrate;
-            msgEl.className = "text-xs text-center text-green-400";
-            msgEl.innerText = `✅ Pack activé ! +${addedHashrate} MH/s ajoutés.`;
         }
 
-        function copyRefLink() {
-            const refInput = document.getElementById('ref-link');
-            refInput.select();
-            navigator.clipboard.writeText(refInput.value);
-            alert("Lien d'affiliation copié !");
+        // Navigation Menu
+        function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('hidden');
         }
 
-        function handleWithdraw(e) {
-            e.preventDefault();
-            const wallet = document.getElementById('wallet').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const msgEl = document.getElementById('withdraw-msg');
-
-            if (amount > balance) {
-                msgEl.className = "text-xs mt-2 text-center text-red-400";
-                msgEl.innerText = "❌ Solde insuffisant !";
-                return;
-            }
-
-            balance -= amount;
-            msgEl.className = "text-xs mt-2 text-center text-green-400";
-            msgEl.innerText = `✅ Demande de ${amount} DOGE envoyée !`;
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById('side-menu').classList.add('hidden');
         }
 
-        function logout() {
-            localStorage.removeItem('doge_session');
+        // Déconnexion
+        async function logout() {
+            await supabase.auth.signOut();
             location.reload();
-        }
-
-        if (currentUser) {
-            showDashboard();
         }
     </script>
 </body>
