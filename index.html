@@ -192,56 +192,73 @@
 
     </div>
 
-    <!-- LOGIQUE JAVASCRIPT -->
+   <!-- LOGIQUE JAVASCRIPT -->
     <script>
-        // Vos clés Supabase
-        const SUPABASE_URL = "https://xxxxxx.supabase.co"; // Remplacez par votre URL Supabase
-        const SUPABASE_KEY = "votre_cle_anon_public";      // Remplacez par votre clé public/anon
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // CONFIGURATION SUPABASE
+        const SUPABASE_URL = "VOTRE_SUPABASE_URL"; // Remplacez par votre URL
+        const SUPABASE_KEY = "VOTRE_SUPABASE_ANON_KEY"; // Remplacez par votre clé anon
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let isSignUp = false;
         let currentUser = null;
         let balance = 10.0;
         let hashrate = 15.5;
 
-        // Basculer le mode entre Connexion et Inscription
+        // BASCOULER ENTRE CONNEXION ET INSCRIPTION
         function toggleAuthMode() {
             isSignUp = !isSignUp;
-            document.getElementById('auth-subtitle').innerText = isSignUp ? "Créer un compte pour commencer" : "Connectez-vous pour commencer à miner";
-            document.getElementById('auth-submit-btn').innerText = isSignUp ? "S'inscrire" : "Se Connecter";
-            document.getElementById('auth-toggle-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
-            document.getElementById('auth-msg').innerText = "";
+            
+            const subtitle = document.getElementById('auth-subtitle');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            const msgEl = document.getElementById('auth-msg');
+
+            msgEl.innerText = "";
+
+            if (isSignUp) {
+                subtitle.innerText = "Créer un nouveau compte pour miner";
+                submitBtn.innerText = "S'inscrire";
+                toggleBtn.innerText = "Déjà un compte ? Se connecter";
+            } else {
+                subtitle.innerText = "Connectez-vous pour commencer à miner";
+                submitBtn.innerText = "Se Connecter";
+                toggleBtn.innerText = "Pas encore de compte ? S'inscrire";
+            }
         }
 
-        // Fonction d'inscription et connexion Supabase
+        // GESTION DE LA SOUMISSION DU FORMULAIRE
         async function handleAuth(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const msgEl = document.getElementById('auth-msg');
 
-            msgEl.innerText = "Chargement...";
+            msgEl.className = "text-xs mb-4 text-center text-yellow-400";
+            msgEl.innerText = "Traitement en cours...";
 
             if (isSignUp) {
-                const { data, error } = await supabase.auth.signUp({ email, password });
+                // Inscription Supabase
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                
                 if (error) {
                     msgEl.className = "text-xs mb-4 text-center text-red-400";
                     return msgEl.innerText = "❌ " + error.message;
                 }
 
                 if (data.user) {
-                    const { error: profileError } = await supabase
-                        .from('profiles')
-                        .insert([{ id: data.user.id, email: email, balance: 10.0, hashrate: 15.5 }]);
-                    
-                    if (profileError) console.error(profileError);
+                    // Enregistrement du profil
+                    await supabaseClient.from('profiles').insert([
+                        { id: data.user.id, email: email, balance: 10.0, hashrate: 15.5 }
+                    ]);
 
                     msgEl.className = "text-xs mb-4 text-center text-green-400";
-                    msgEl.innerText = "✅ Compte créé ! Vous pouvez vous connecter.";
+                    msgEl.innerText = "✅ Compte créé avec succès ! Connectez-vous.";
                     toggleAuthMode();
                 }
             } else {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                // Connexion Supabase
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                
                 if (error) {
                     msgEl.className = "text-xs mb-4 text-center text-red-400";
                     return msgEl.innerText = "❌ " + error.message;
@@ -252,9 +269,9 @@
             }
         }
 
-        // Charger les données de l'utilisateur depuis Supabase
+        // CHARGEMENT DU TABLEAU DE BORD
         async function loadUserData() {
-            const { data, error } = await supabase
+            const { data } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', currentUser.id)
@@ -270,10 +287,10 @@
             document.getElementById('ref-link').value = `${window.location.origin}?ref=${currentUser.id}`;
 
             setInterval(updateMining, 100);
-            setInterval(saveToCloud, 5000); // Sauvegarde auto sur Supabase toutes les 5 sec
+            setInterval(saveToCloud, 5000);
         }
 
-        // Boucle de calcul du minage en direct
+        // CALCUL DU MINAGE EN DIRECT
         function updateMining() {
             const ratePerSec = hashrate * 0.00001;
             balance += ratePerSec / 10;
@@ -283,14 +300,14 @@
             document.getElementById('rate').innerText = ratePerSec.toFixed(6);
         }
 
-        // Enregistrer la progression dans la base de données
+        // SAUVEGARDE EN BASE DE DONNÉES
         async function saveToCloud() {
             if (currentUser) {
-                await supabase.from('profiles').update({ balance, hashrate }).eq('id', currentUser.id);
+                await supabaseClient.from('profiles').update({ balance, hashrate }).eq('id', currentUser.id);
             }
         }
 
-        // Navigation Menu
+        // NAVIGATION MENU BURGER
         function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('hidden');
         }
@@ -301,9 +318,9 @@
             document.getElementById('side-menu').classList.add('hidden');
         }
 
-        // Déconnexion
+        // DÉCONNEXION
         async function logout() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             location.reload();
         }
     </script>
