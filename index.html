@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DogeMiner - Minage en Ligne</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
+        <!-- En-tête -->
+        <div class="flex items-center justify-between border-b border-gray-700 pb-4 mb-6">
+            <h1 class="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+                🐕 DogeMiner
+            </h1>
+            <span id="status-badge" class="inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-400 px-3 py-1 rounded-full border border-green-500/20">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> Actif
+            </span>
+        </div>
+
+        <!-- Statistiques de Minage -->
+        <div class="space-y-4 mb-6">
+            <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
+                <div id="balance" class="text-3xl font-extrabold text-yellow-400 font-mono">0.000000</div>
+            </div>
+
+            <div class="flex gap-4">
+                <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                    <p class="text-xs text-gray-400 mb-1">Puissance</p>
+                    <p class="text-lg font-bold text-white"><span id="hashrate">15.5</span> MH/s</p>
+                </div>
+                <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                    <p class="text-xs text-gray-400 mb-1">Gain / sec</p>
+                    <p class="text-lg font-bold text-white"><span id="rate">0.000155</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Retrait -->
+        <div class="border-t border-gray-700 pt-4">
+            <h2 class="text-sm font-semibold mb-3 text-gray-300">Demander un Retrait</h2>
+            <form id="withdraw-form" onsubmit="handleWithdraw(event)" class="space-y-3">
+                <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition duration-200">
+                    Retirer mes DOGE
+                </button>
+            </form>
+            <p id="message" class="text-xs mt-3 text-center min-h-[16px]"></p>
+        </div>
+    </div>
+
+    <!-- Script de logique de minage intégrée -->
+    <script>
+        // Configuration de départ
+        const HASHRATE = 15.5; // MH/s
+        const RATE_PER_SECOND = 0.000155; // DOGE par seconde
+        
+        // Charger ou initialiser le solde depuis le LocalStorage du navigateur
+        let balance = parseFloat(localStorage.getItem('doge_balance')) || 10.000000;
+        let lastUpdate = parseInt(localStorage.getItem('doge_last_update')) || Date.now();
+
+        // Calculer les gains accumulés hors ligne
+        const now = Date.now();
+        const elapsedSeconds = (now - lastUpdate) / 1000;
+        balance += elapsedSeconds * RATE_PER_SECOND;
+
+        const balanceEl = document.getElementById('balance');
+        const msgEl = document.getElementById('message');
+
+        // Mettre à jour l'affichage et sauvegarder
+        function updateMining() {
+            balance += RATE_PER_SECOND / 10;
+            balanceEl.innerText = balance.toFixed(6);
+            
+            // Sauvegarde dans le navigateur
+            localStorage.setItem('doge_balance', balance.toString());
+            localStorage.setItem('doge_last_update', Date.now().toString());
+        }
+
+        // Mettre à jour le solde toutes les 100ms pour une animation fluide
+        setInterval(updateMining, 100);
+
+        // Gestion du formulaire de retrait
+        function handleWithdraw(e) {
+            e.preventDefault();
+            const wallet = document.getElementById('wallet').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if (amount > balance) {
+                msgEl.className = "text-xs mt-3 text-center text-red-400";
+                msgEl.innerText = "❌ Solde insuffisant !";
+                return;
+            }
+
+            // Déduire le montant du solde
+            balance -= amount;
+            localStorage.setItem('doge_balance', balance.toString());
+            
+            msgEl.className = "text-xs mt-3 text-center text-green-400";
+            msgEl.innerText = `✅ Retrait de ${amount} DOGE vers ${wallet.slice(0, 6)}... en cours !`;
+            
+            document.getElementById('withdraw-form').reset();
+        }
+    </script>
+</body>
+</html>
