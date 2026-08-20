@@ -36,22 +36,21 @@
         </form>
 
         <div class="mt-4 text-center">
-           <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-gray-400 hover:text-yellow-400 underline">
-    Pas encore de compte ? S'inscrire
-</button>
+            <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-gray-400 hover:text-yellow-400 underline">
+                Pas encore de compte ? S'inscrire
+            </button>
         </div>
     </div>
 
 
     <!-- ========================================== -->
-    <!-- 2. APPLICATION PRINCIPALE (Masquée au départ) -->
+    <!-- 2. APPLICATION PRINCIPALE -->
     <!-- ========================================== -->
     <div id="dashboard-card" class="hidden max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6 relative overflow-hidden">
         
-        <!-- BARRE DE NAVIGATION SUPÉRIEURE (AVEC MENU BURGER) -->
+        <!-- BARRE DE NAVIGATION SUPÉRIEURE -->
         <div class="flex items-center justify-between border-b border-gray-700 pb-4">
             <div class="flex items-center gap-3">
-                <!-- Bouton 3 Barres (Burger Menu) -->
                 <button onclick="toggleMenu()" class="p-2 text-gray-300 hover:text-yellow-400 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -81,10 +80,8 @@
             </button>
         </div>
 
-
-        <!-- ================= PAGE 1 : MINAGE ================= -->
+        <!-- PAGE 1 : MINAGE -->
         <div id="page-mining" class="page-content space-y-6">
-            <!-- Statistiques Solde -->
             <div class="space-y-3">
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
                     <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
@@ -103,7 +100,6 @@
                 </div>
             </div>
 
-            <!-- Formulaire de Retrait -->
             <div class="border-t border-gray-700 pt-4">
                 <h2 class="text-sm font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
                 <form onsubmit="handleWithdraw(event)" class="space-y-3">
@@ -115,26 +111,21 @@
             </div>
         </div>
 
-
-        <!-- ================= PAGE 2 : ACHAT DE MINAGE ================= -->
+        <!-- PAGE 2 : ACHAT DE MINAGE -->
         <div id="page-plans" class="page-content hidden space-y-4">
             <h2 class="text-base font-bold text-yellow-400">🚀 Augmenter votre Puissance</h2>
-            <p class="text-xs text-gray-400">Achetez de la puissance de calcul supplémentaire pour miner jusqu'à 100x plus vite.</p>
+            <p class="text-xs text-gray-400">Achetez de la puissance de calcul supplémentaire pour miner plus vite.</p>
 
             <div class="space-y-3">
-                <!-- Plan 1 -->
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
                     <div>
                         <p class="font-bold text-sm text-white">Pack STARTER</p>
                         <p class="text-xs text-yellow-400">+50 MH/s de puissance</p>
                         <p class="text-[10px] text-gray-400 mt-1">Prix: 50 DOGE (~ $8)</p>
                     </div>
-                    <button onclick="buyPlan(50, 50)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
-                        Acheter
-                    </button>
+                    <button onclick="buyPlan(50, 50)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Acheter</button>
                 </div>
 
-                <!-- Plan 2 -->
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-yellow-500/50 flex justify-between items-center relative overflow-hidden">
                     <span class="absolute top-0 right-0 bg-yellow-500 text-gray-900 text-[8px] font-black px-2 py-0.5 rounded-bl">POPULAIRE</span>
                     <div>
@@ -142,39 +133,31 @@
                         <p class="text-xs text-yellow-400">+200 MH/s de puissance</p>
                         <p class="text-[10px] text-gray-400 mt-1">Prix: 180 DOGE (~ $28)</p>
                     </div>
-                    <button onclick="buyPlan(200, 180)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
-                        Acheter
-                    </button>
+                    <button onclick="buyPlan(200, 180)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Acheter</button>
                 </div>
 
-                <!-- Plan 3 -->
                 <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
                     <div>
                         <p class="font-bold text-sm text-white">Pack RIG VIP</p>
                         <p class="text-xs text-yellow-400">+1000 MH/s de puissance</p>
                         <p class="text-[10px] text-gray-400 mt-1">Prix: 800 DOGE (~ $120)</p>
                     </div>
-                    <button onclick="buyPlan(1000, 800)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
-                        Acheter
-                    </button>
+                    <button onclick="buyPlan(1000, 800)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Acheter</button>
                 </div>
             </div>
             <p id="plan-msg" class="text-xs text-center min-h-[16px]"></p>
         </div>
 
-
-        <!-- ================= PAGE 3 : AFFILIATION ================= -->
+        <!-- PAGE 3 : AFFILIATION -->
         <div id="page-referral" class="page-content hidden space-y-4">
             <h2 class="text-base font-bold text-yellow-400">🤝 Programme d'Affiliation</h2>
-            <p class="text-xs text-gray-400">Invitez vos amis et recevez un bonus permanent de 10% sur toute la puissance de minage qu'ils accumulent.</p>
+            <p class="text-xs text-gray-400">Invitez vos amis et recevez un bonus permanent de 10% sur toute la puissance qu'ils accumulent.</p>
 
             <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50 space-y-3">
                 <label class="block text-xs text-gray-400">Votre Lien d'Affiliation Unique :</label>
                 <div class="flex gap-2">
                     <input type="text" id="ref-link" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none">
-                    <button onclick="copyRefLink()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
-                        Copier
-                    </button>
+                    <button onclick="copyRefLink()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">Copier</button>
                 </div>
             </div>
 
@@ -192,12 +175,16 @@
 
     </div>
 
-   <!-- LOGIQUE JAVASCRIPT -->
+    <!-- LOGIQUE JAVASCRIPT -->
     <script>
-        // CONFIGURATION SUPABASE
-        const SUPABASE_URL = "VOTRE_SUPABASE_URL"; // Remplacez par votre URL
-        const SUPABASE_KEY = "VOTRE_SUPABASE_ANON_KEY"; // Remplacez par votre clé anon
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // REMPLACEZ CES DEUX LIGNES PAR VOS VRAIS IDENTIFIANTS SUPABASE
+        const SUPABASE_URL = "https://xxxxxx.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiI..."; 
+        
+        let supabaseClient = null;
+        if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== "https://xxxxxx.supabase.co") {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
 
         let isSignUp = false;
         let currentUser = null;
@@ -233,11 +220,15 @@
             const password = document.getElementById('auth-password').value;
             const msgEl = document.getElementById('auth-msg');
 
+            if (!supabaseClient) {
+                msgEl.className = "text-xs mb-4 text-center text-red-400";
+                return msgEl.innerText = "❌ Veuillez d'abord renseigner vos identifiants Supabase dans le code !";
+            }
+
             msgEl.className = "text-xs mb-4 text-center text-yellow-400";
             msgEl.innerText = "Traitement en cours...";
 
             if (isSignUp) {
-                // Inscription Supabase
                 const { data, error } = await supabaseClient.auth.signUp({ email, password });
                 
                 if (error) {
@@ -246,17 +237,15 @@
                 }
 
                 if (data.user) {
-                    // Enregistrement du profil
                     await supabaseClient.from('profiles').insert([
                         { id: data.user.id, email: email, balance: 10.0, hashrate: 15.5 }
                     ]);
 
                     msgEl.className = "text-xs mb-4 text-center text-green-400";
-                    msgEl.innerText = "✅ Compte créé avec succès ! Connectez-vous.";
+                    msgEl.innerText = "✅ Compte créé ! Connectez-vous.";
                     toggleAuthMode();
                 }
             } else {
-                // Connexion Supabase
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 
                 if (error) {
@@ -302,12 +291,12 @@
 
         // SAUVEGARDE EN BASE DE DONNÉES
         async function saveToCloud() {
-            if (currentUser) {
+            if (currentUser && supabaseClient) {
                 await supabaseClient.from('profiles').update({ balance, hashrate }).eq('id', currentUser.id);
             }
         }
 
-        // NAVIGATION MENU BURGER
+        // NAVIGATION MENU BURGER ET PAGES
         function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('hidden');
         }
@@ -318,9 +307,36 @@
             document.getElementById('side-menu').classList.add('hidden');
         }
 
+        function handleWithdraw(e) {
+            e.preventDefault();
+            const msg = document.getElementById('withdraw-msg');
+            msg.className = "text-xs mt-2 text-center text-red-400";
+            msg.innerText = "❌ Solde insuffisant pour procéder au retrait.";
+        }
+
+        function buyPlan(addedHash, cost) {
+            const msg = document.getElementById('plan-msg');
+            if (balance >= cost) {
+                balance -= cost;
+                hashrate += addedHash;
+                msg.className = "text-xs text-center text-green-400";
+                msg.innerText = "✅ Achat effectué avec succès !";
+            } else {
+                msg.className = "text-xs text-center text-red-400";
+                msg.innerText = "❌ Solde DOGE insuffisant.";
+            }
+        }
+
+        function copyRefLink() {
+            const copyText = document.getElementById("ref-link");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert("Lien d'affiliation copié !");
+        }
+
         // DÉCONNEXION
         async function logout() {
-            await supabaseClient.auth.signOut();
+            if (supabaseClient) await supabaseClient.auth.signOut();
             location.reload();
         }
     </script>
