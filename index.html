@@ -108,7 +108,7 @@
                 <h2 class="text-base font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
                 <form onsubmit="handleWithdraw(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
-                    <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                    <input type="number" id="amount" required step="any" min="50" placeholder="Montant DOGE (Min: 50)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
                     <button type="submit" class="md:col-span-2 w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2.5 rounded-lg transition cursor-pointer">Retirer mes DOGE</button>
                 </form>
                 <p id="withdraw-msg" class="text-xs mt-2 text-center min-h-[16px]"></p>
@@ -447,6 +447,12 @@
             const wallet = document.getElementById('wallet').value;
             const amount = parseFloat(document.getElementById('amount').value);
             const msg = document.getElementById('withdraw-msg');
+
+            if (amount < 50) {
+                msg.className = "text-xs mt-2 text-center text-red-400";
+                msg.innerText = "❌ Le montant minimum de retrait est de 50 DOGE.";
+                return;
+            }
 
             if (balance < amount) {
                 msg.className = "text-xs mt-2 text-center text-red-400";
