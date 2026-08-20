@@ -195,9 +195,9 @@
     <!-- LOGIQUE JS -->
     <script>
         // CONFIGURATION SUPABASE (Si configuré)
-        const SUPABASE_URL = "VOTRE_SUPABASE_URL";
-        const SUPABASE_KEY = "VOTRE_SUPABASE_ANON_KEY";
-        const supabaseClient = (SUPABASE_URL !== "VOTRE_SUPABASE_URL") ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+        const SUPABASE_URL = "https://ptqtousqgtuybotaicrx.supabase.coL";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0cXRvdXNxZ3R1eWJvdGFpY3J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyMTY5MTksImV4cCI6MjEwMjc5MjkxOX0.Aur5mUVLz8dJi4Gxv51FAMdiNHqX2t8bFHzRc7FwqAk";
+        const supabaseClient = (SUPABASE_URL !== "https://ptqtousqgtuybotaicrx.supabase.co") ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
         let isSignUp = false;
         let currentUser = JSON.parse(localStorage.getItem('doge_session')) || null;
