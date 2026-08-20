@@ -3,42 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DogeMiner - Espace Membre</title>
+    <title>DogeMiner - Cloud Mining Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
     <!-- ========================================== -->
-    <!-- 1. FORMULAIRE DE CONNEXION & INSCRIPTION -->
+    <!-- 1. FORMULAIRE D'AUTHENTIFICATION -->
     <!-- ========================================== -->
     <div id="auth-card" class="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
         <div class="text-center mb-6">
-            <h1 class="text-3xl font-bold text-yellow-400 flex items-center justify-center gap-2">
-                🐕 DogeMiner
-            </h1>
+            <h1 class="text-3xl font-bold text-yellow-400">🐕 DogeMiner</h1>
             <p id="auth-subtitle" class="text-xs text-gray-400 mt-1">Connectez-vous pour commencer à miner</p>
         </div>
 
-        <!-- Message d'erreur / succès -->
         <p id="auth-msg" class="text-xs mb-4 text-center min-h-[16px]"></p>
 
-        <!-- Formulaire -->
-        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+        <form onsubmit="handleAuth(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-medium text-gray-400 mb-1">Adresse Email</label>
-                <input type="email" id="auth-email" required placeholder="nom@exemple.com" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                <label class="block text-xs font-medium text-gray-400 mb-1">Email</label>
+                <input type="email" id="auth-email" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1">Mot de passe</label>
-                <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                <input type="password" id="auth-password" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
             </div>
 
-            <button type="submit" id="auth-submit-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition duration-200">
+            <button type="submit" id="auth-submit-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition">
                 Se Connecter
             </button>
         </form>
 
-        <!-- Basculer entre Connexion et Inscription -->
         <div class="mt-4 text-center">
             <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-gray-400 hover:text-yellow-400 underline">
                 Pas encore de compte ? S'inscrire
@@ -48,144 +44,203 @@
 
 
     <!-- ========================================== -->
-    <!-- 2. TABLEAU DE BORD (Masqué par défaut) -->
+    <!-- 2. APPLICATION PRINCIPALE (Masquée au départ) -->
     <!-- ========================================== -->
-    <div id="dashboard-card" class="hidden max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6">
-        <!-- En-tête Tableau de bord -->
+    <div id="dashboard-card" class="hidden max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6 relative overflow-hidden">
+        
+        <!-- BARRE DE NAVIGATION SUPÉRIEURE (AVEC MENU BURGER) -->
         <div class="flex items-center justify-between border-b border-gray-700 pb-4">
-            <div>
-                <h1 class="text-xl font-bold text-yellow-400 flex items-center gap-2">🐕 DogeMiner</h1>
-                <p id="user-email-display" class="text-[10px] text-gray-400"></p>
+            <div class="flex items-center gap-3">
+                <!-- Bouton 3 Barres (Burger Menu) -->
+                <button onclick="toggleMenu()" class="p-2 text-gray-300 hover:text-yellow-400 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h1 class="text-xl font-bold text-yellow-400">🐕 DogeMiner</h1>
             </div>
-            <button onclick="logout()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1 rounded-lg transition">
-                Déconnexion
+            <span class="inline-flex items-center gap-1 text-[10px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> Actif
+            </span>
+        </div>
+
+        <!-- MENU LATÉRAL DEROULANT -->
+        <div id="side-menu" class="hidden absolute top-16 left-0 w-full bg-gray-800/95 backdrop-blur-md border-b border-gray-700 p-4 space-y-2 z-50 shadow-2xl">
+            <button onclick="showPage('page-mining')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">
+                ⛏️ Tableau de Bord (Minage)
+            </button>
+            <button onclick="showPage('page-plans')" class="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-gray-700/60 rounded-lg flex items-center gap-2 font-semibold">
+                ⚡ Booster de Minage (Acheter)
+            </button>
+            <button onclick="showPage('page-referral')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">
+                🤝 Programme d'Affiliation
+            </button>
+            <hr class="border-gray-700 my-2">
+            <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2">
+                🚪 Déconnexion
             </button>
         </div>
 
-        <!-- Statistiques de Minage -->
-        <div class="space-y-3">
-            <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
-                <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
-                <div id="balance" class="text-3xl font-extrabold text-yellow-400 font-mono">0.000000</div>
+
+        <!-- ================= PAGE 1 : MINAGE ================= -->
+        <div id="page-mining" class="page-content space-y-6">
+            <!-- Statistiques Solde -->
+            <div class="space-y-3">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                    <p class="text-xs text-gray-400 mb-1">Solde Miner (DOGE)</p>
+                    <div id="balance" class="text-3xl font-extrabold text-yellow-400 font-mono">0.000000</div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                        <p class="text-xs text-gray-400 mb-1">Puissance</p>
+                        <p class="text-lg font-bold text-white"><span id="hashrate">15.5</span> MH/s</p>
+                    </div>
+                    <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
+                        <p class="text-xs text-gray-400 mb-1">Gain / sec</p>
+                        <p class="text-lg font-bold text-white"><span id="rate">0.000155</span></p>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex gap-4">
-                <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
-                    <p class="text-xs text-gray-400 mb-1">Puissance</p>
-                    <p class="text-lg font-bold text-white"><span id="hashrate">15.5</span> MH/s</p>
-                </div>
-                <div class="flex-1 bg-gray-900/60 p-4 rounded-xl border border-gray-700/50">
-                    <p class="text-xs text-gray-400 mb-1">Gain / sec</p>
-                    <p class="text-lg font-bold text-white"><span id="rate">0.000155</span></p>
-                </div>
+            <!-- Formulaire de Retrait -->
+            <div class="border-t border-gray-700 pt-4">
+                <h2 class="text-sm font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
+                <form onsubmit="handleWithdraw(event)" class="space-y-3">
+                    <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                    <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+                    <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition">Retirer mes DOGE</button>
+                </form>
+                <p id="withdraw-msg" class="text-xs mt-2 text-center min-h-[16px]"></p>
             </div>
         </div>
 
-        <!-- Tâches -->
-        <div class="border-t border-gray-700 pt-4">
-            <h2 class="text-sm font-semibold mb-3 text-gray-300">⚡ Tâches & Bonus</h2>
-            <div class="space-y-2">
-                <div class="flex items-center justify-between bg-gray-900/40 p-3 rounded-lg border border-gray-700/40">
+
+        <!-- ================= PAGE 2 : ACHAT DE MINAGE ================= -->
+        <div id="page-plans" class="page-content hidden space-y-4">
+            <h2 class="text-base font-bold text-yellow-400">🚀 Augmenter votre Puissance</h2>
+            <p class="text-xs text-gray-400">Achetez de la puissance de calcul supplémentaire pour miner jusqu'à 100x plus vite.</p>
+
+            <div class="space-y-3">
+                <!-- Plan 1 -->
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
                     <div>
-                        <p class="text-xs font-bold text-white">Abonnement Twitter</p>
-                        <p class="text-[10px] text-gray-400">+2.5 MH/s</p>
+                        <p class="font-bold text-sm text-white">Pack STARTER</p>
+                        <p class="text-xs text-yellow-400">+50 MH/s de puissance</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Prix: 50 DOGE (~ $8)</p>
                     </div>
-                    <button id="task-1-btn" onclick="completeTask(1, 2.5)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1.5 rounded transition">
-                        Réclamer
+                    <button onclick="buyPlan(50, 50)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
+                        Acheter
+                    </button>
+                </div>
+
+                <!-- Plan 2 -->
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-yellow-500/50 flex justify-between items-center relative overflow-hidden">
+                    <span class="absolute top-0 right-0 bg-yellow-500 text-gray-900 text-[8px] font-black px-2 py-0.5 rounded-bl">POPULAIRE</span>
+                    <div>
+                        <p class="font-bold text-sm text-white">Pack PRO MINER</p>
+                        <p class="text-xs text-yellow-400">+200 MH/s de puissance</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Prix: 180 DOGE (~ $28)</p>
+                    </div>
+                    <button onclick="buyPlan(200, 180)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
+                        Acheter
+                    </button>
+                </div>
+
+                <!-- Plan 3 -->
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-sm text-white">Pack RIG VIP</p>
+                        <p class="text-xs text-yellow-400">+1000 MH/s de puissance</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Prix: 800 DOGE (~ $120)</p>
+                    </div>
+                    <button onclick="buyPlan(1000, 800)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
+                        Acheter
                     </button>
                 </div>
             </div>
+            <p id="plan-msg" class="text-xs text-center min-h-[16px]"></p>
         </div>
 
-        <!-- Parrainage -->
-        <div class="border-t border-gray-700 pt-4">
-            <h2 class="text-sm font-semibold mb-2 text-gray-300">🤝 Mon Lien d'Affiliation</h2>
-            <div class="flex gap-2">
-                <input type="text" id="ref-link" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 focus:outline-none">
-                <button onclick="copyRefLink()" class="bg-gray-700 hover:bg-gray-600 text-xs font-bold px-3 py-1.5 rounded text-white transition">Copier</button>
+
+        <!-- ================= PAGE 3 : AFFILIATION ================= -->
+        <div id="page-referral" class="page-content hidden space-y-4">
+            <h2 class="text-base font-bold text-yellow-400">🤝 Programme d'Affiliation</h2>
+            <p class="text-xs text-gray-400">Invitez vos amis et recevez un bonus permanent de 10% sur toute la puissance de minage qu'ils accumulent.</p>
+
+            <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-700/50 space-y-3">
+                <label class="block text-xs text-gray-400">Votre Lien d'Affiliation Unique :</label>
+                <div class="flex gap-2">
+                    <input type="text" id="ref-link" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none">
+                    <button onclick="copyRefLink()" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-xs px-3 py-2 rounded-lg transition">
+                        Copier
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50 text-center">
+                    <p class="text-[10px] text-gray-400">Filleuls Inscrits</p>
+                    <p id="ref-count" class="text-xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/50 text-center">
+                    <p class="text-[10px] text-gray-400">Gains Affiliation</p>
+                    <p id="ref-earnings" class="text-xl font-bold text-yellow-400 mt-1">+0 MH/s</p>
+                </div>
             </div>
         </div>
 
-        <!-- Retrait -->
-        <div class="border-t border-gray-700 pt-4">
-            <h2 class="text-sm font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
-            <form id="withdraw-form" onsubmit="handleWithdraw(event)" class="space-y-3">
-                <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
-                <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition duration-200">Retirer</button>
-            </form>
-            <p id="withdraw-msg" class="text-xs mt-2 text-center min-h-[16px]"></p>
-        </div>
     </div>
 
     <!-- LOGIQUE JS -->
     <script>
+        // CONFIGURATION SUPABASE (Si configuré)
+        const SUPABASE_URL = "VOTRE_SUPABASE_URL";
+        const SUPABASE_KEY = "VOTRE_SUPABASE_ANON_KEY";
+        const supabaseClient = (SUPABASE_URL !== "VOTRE_SUPABASE_URL") ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
         let isSignUp = false;
         let currentUser = JSON.parse(localStorage.getItem('doge_session')) || null;
-
+        let balance = 10.0;
         let hashrate = 15.5;
-        let balance = 10.000000;
-        let completedTasks = [];
-        let miningInterval = null;
 
-        // Basculer Inscription / Connexion
+        // Gestion du Menu Burger
+        function toggleMenu() {
+            const menu = document.getElementById('side-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Navigation entre les pages
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById('side-menu').classList.add('hidden');
+        }
+
         function toggleAuthMode() {
             isSignUp = !isSignUp;
             document.getElementById('auth-subtitle').innerText = isSignUp ? "Créer un compte pour commencer" : "Connectez-vous pour commencer à miner";
             document.getElementById('auth-submit-btn').innerText = isSignUp ? "S'inscrire" : "Se Connecter";
             document.getElementById('auth-toggle-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
-            document.getElementById('auth-msg').innerText = "";
         }
 
-        // Simuler la Connexion / Inscription
         function handleAuth(e) {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const msgEl = document.getElementById('auth-msg');
-
-            if (password.length < 6) {
-                msgEl.className = "text-xs mb-4 text-center text-red-400";
-                msgEl.innerText = "Le mot de passe doit contenir au moins 6 caractères.";
-                return;
-            }
-
-            // Enregistrer la session utilisateur
             currentUser = { email: email, id: 'usr_' + Math.random().toString(36).substring(2, 9) };
             localStorage.setItem('doge_session', JSON.stringify(currentUser));
-
-            msgEl.className = "text-xs mb-4 text-center text-green-400";
-            msgEl.innerText = isSignUp ? "Compte créé avec succès !" : "Connexion réussie !";
-
-            setTimeout(() => {
-                showDashboard();
-            }, 600);
+            showDashboard();
         }
 
         function showDashboard() {
             document.getElementById('auth-card').classList.add('hidden');
             document.getElementById('dashboard-card').classList.remove('hidden');
-            document.getElementById('user-email-display').innerText = currentUser.email;
             document.getElementById('ref-link').value = `${window.location.origin}?ref=${currentUser.id}`;
 
-            // Charger les données utilisateur
             hashrate = parseFloat(localStorage.getItem(`hashrate_${currentUser.email}`)) || 15.5;
             balance = parseFloat(localStorage.getItem(`balance_${currentUser.email}`)) || 10.000000;
-            completedTasks = JSON.parse(localStorage.getItem(`tasks_${currentUser.email}`)) || [];
 
-            completedTasks.forEach(id => updateTaskUI(id));
-
-            // Démarrer la boucle de minage
-            if (!miningInterval) {
-                miningInterval = setInterval(updateMining, 100);
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('doge_session');
-            clearInterval(miningInterval);
-            miningInterval = null;
-            location.reload();
+            setInterval(updateMining, 100);
         }
 
         function updateMining() {
@@ -200,28 +255,25 @@
             localStorage.setItem(`hashrate_${currentUser.email}`, hashrate.toString());
         }
 
-        function completeTask(taskId, bonus) {
-            if (completedTasks.includes(taskId)) return;
-            hashrate += bonus;
-            completedTasks.push(taskId);
-            localStorage.setItem(`tasks_${currentUser.email}`, JSON.stringify(completedTasks));
-            updateTaskUI(taskId);
-        }
-
-        function updateTaskUI(taskId) {
-            const btn = document.getElementById(`task-${taskId}-btn`);
-            if (btn) {
-                btn.innerText = "Complété ✓";
-                btn.disabled = true;
-                btn.className = "bg-gray-700 text-gray-400 text-xs font-bold px-3 py-1.5 rounded cursor-not-allowed";
+        function buyPlan(addedHashrate, cost) {
+            const msgEl = document.getElementById('plan-msg');
+            if (balance < cost) {
+                msgEl.className = "text-xs text-center text-red-400";
+                msgEl.innerText = `❌ Solde insuffisant (${cost} DOGE requis). Minez davantage ou déposez des fonds.`;
+                return;
             }
+
+            balance -= cost;
+            hashrate += addedHashrate;
+            msgEl.className = "text-xs text-center text-green-400";
+            msgEl.innerText = `✅ Pack activé ! +${addedHashrate} MH/s ajoutés.`;
         }
 
         function copyRefLink() {
             const refInput = document.getElementById('ref-link');
             refInput.select();
             navigator.clipboard.writeText(refInput.value);
-            alert("Lien de parrainage copié !");
+            alert("Lien d'affiliation copié !");
         }
 
         function handleWithdraw(e) {
@@ -237,13 +289,15 @@
             }
 
             balance -= amount;
-            localStorage.setItem(`balance_${currentUser.email}`, balance.toString());
             msgEl.className = "text-xs mt-2 text-center text-green-400";
-            msgEl.innerText = `✅ Retrait de ${amount} DOGE envoyé !`;
-            document.getElementById('withdraw-form').reset();
+            msgEl.innerText = `✅ Demande de ${amount} DOGE envoyée !`;
         }
 
-        // Vérifier si une session est déjà active au chargement
+        function logout() {
+            localStorage.removeItem('doge_session');
+            location.reload();
+        }
+
         if (currentUser) {
             showDashboard();
         }
