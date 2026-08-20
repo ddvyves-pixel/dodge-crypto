@@ -3,20 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DogeMiner - Minage & Tâches</title>
+    <title>DogeMiner - Espace Membre</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6">
-        <!-- En-tête -->
-        <div class="flex items-center justify-between border-b border-gray-700 pb-4">
-            <h1 class="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+    <!-- ========================================== -->
+    <!-- 1. FORMULAIRE DE CONNEXION & INSCRIPTION -->
+    <!-- ========================================== -->
+    <div id="auth-card" class="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-yellow-400 flex items-center justify-center gap-2">
                 🐕 DogeMiner
             </h1>
-            <span class="inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-400 px-3 py-1 rounded-full border border-green-500/20">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> En ligne
-            </span>
+            <p id="auth-subtitle" class="text-xs text-gray-400 mt-1">Connectez-vous pour commencer à miner</p>
+        </div>
+
+        <!-- Message d'erreur / succès -->
+        <p id="auth-msg" class="text-xs mb-4 text-center min-h-[16px]"></p>
+
+        <!-- Formulaire -->
+        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Adresse Email</label>
+                <input type="email" id="auth-email" required placeholder="nom@exemple.com" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Mot de passe</label>
+                <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
+            </div>
+
+            <button type="submit" id="auth-submit-btn" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition duration-200">
+                Se Connecter
+            </button>
+        </form>
+
+        <!-- Basculer entre Connexion et Inscription -->
+        <div class="mt-4 text-center">
+            <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-gray-400 hover:text-yellow-400 underline">
+                Pas encore de compte ? S'inscrire
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. TABLEAU DE BORD (Masqué par défaut) -->
+    <!-- ========================================== -->
+    <div id="dashboard-card" class="hidden max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-700 space-y-6">
+        <!-- En-tête Tableau de bord -->
+        <div class="flex items-center justify-between border-b border-gray-700 pb-4">
+            <div>
+                <h1 class="text-xl font-bold text-yellow-400 flex items-center gap-2">🐕 DogeMiner</h1>
+                <p id="user-email-display" class="text-[10px] text-gray-400"></p>
+            </div>
+            <button onclick="logout()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1 rounded-lg transition">
+                Déconnexion
+            </button>
         </div>
 
         <!-- Statistiques de Minage -->
@@ -38,106 +81,130 @@
             </div>
         </div>
 
-        <!-- Section 1 : Tâches & Bonus -->
+        <!-- Tâches -->
         <div class="border-t border-gray-700 pt-4">
-            <h2 class="text-sm font-semibold mb-3 text-gray-300">⚡ Tâches & Bonus de Puissance</h2>
+            <h2 class="text-sm font-semibold mb-3 text-gray-300">⚡ Tâches & Bonus</h2>
             <div class="space-y-2">
                 <div class="flex items-center justify-between bg-gray-900/40 p-3 rounded-lg border border-gray-700/40">
                     <div>
-                        <p class="text-xs font-bold text-white">Abonnement X (Twitter)</p>
-                        <p class="text-[10px] text-gray-400">+2.5 MH/s permanent</p>
+                        <p class="text-xs font-bold text-white">Abonnement Twitter</p>
+                        <p class="text-[10px] text-gray-400">+2.5 MH/s</p>
                     </div>
                     <button id="task-1-btn" onclick="completeTask(1, 2.5)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1.5 rounded transition">
                         Réclamer
                     </button>
                 </div>
-                <div class="flex items-center justify-between bg-gray-900/40 p-3 rounded-lg border border-gray-700/40">
-                    <div>
-                        <p class="text-xs font-bold text-white">Rejoindre le Telegram</p>
-                        <p class="text-[10px] text-gray-400">+5.0 MH/s permanent</p>
-                    </div>
-                    <button id="task-2-btn" onclick="completeTask(2, 5.0)" class="bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1.5 rounded transition">
-                        Réclamer
-                    </button>
-                </div>
             </div>
         </div>
 
-        <!-- Section 2 : Programme d'Affiliation -->
+        <!-- Parrainage -->
         <div class="border-t border-gray-700 pt-4">
-            <h2 class="text-sm font-semibold mb-2 text-gray-300">🤝 Programme de Parrainage</h2>
-            <p class="text-[11px] text-gray-400 mb-3">Partagez votre lien et gagnez 10% de bonus de puissance sur vos filleuls !</p>
+            <h2 class="text-sm font-semibold mb-2 text-gray-300">🤝 Mon Lien d'Affiliation</h2>
             <div class="flex gap-2">
                 <input type="text" id="ref-link" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 focus:outline-none">
-                <button onclick="copyRefLink()" class="bg-gray-700 hover:bg-gray-600 text-xs font-bold px-3 py-1.5 rounded text-white transition">
-                    Copier
-                </button>
+                <button onclick="copyRefLink()" class="bg-gray-700 hover:bg-gray-600 text-xs font-bold px-3 py-1.5 rounded text-white transition">Copier</button>
             </div>
         </div>
 
-        <!-- Section 3 : Retrait -->
+        <!-- Retrait -->
         <div class="border-t border-gray-700 pt-4">
             <h2 class="text-sm font-semibold mb-3 text-gray-300">💸 Demander un Retrait</h2>
             <form id="withdraw-form" onsubmit="handleWithdraw(event)" class="space-y-3">
                 <input type="text" id="wallet" required placeholder="Adresse Dogecoin" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
                 <input type="number" id="amount" required step="any" min="10" placeholder="Montant DOGE (Min: 10)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400">
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition duration-200">
-                    Retirer mes DOGE
-                </button>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg transition duration-200">Retirer</button>
             </form>
-            <p id="message" class="text-xs mt-2 text-center min-h-[16px]"></p>
+            <p id="withdraw-msg" class="text-xs mt-2 text-center min-h-[16px]"></p>
         </div>
     </div>
 
+    <!-- LOGIQUE JS -->
     <script>
-        // --- INITIALISATION DES DONNÉES ---
-        let userId = localStorage.getItem('doge_user_id') || 'usr_' + Math.random().toString(36).substring(2, 9);
-        localStorage.setItem('doge_user_id', userId);
+        let isSignUp = false;
+        let currentUser = JSON.parse(localStorage.getItem('doge_session')) || null;
 
-        let hashrate = parseFloat(localStorage.getItem('doge_hashrate')) || 15.5;
-        let balance = parseFloat(localStorage.getItem('doge_balance')) || 10.000000;
-        let lastUpdate = parseInt(localStorage.getItem('doge_last_update')) || Date.now();
-        let completedTasks = JSON.parse(localStorage.getItem('doge_tasks')) || [];
+        let hashrate = 15.5;
+        let balance = 10.000000;
+        let completedTasks = [];
+        let miningInterval = null;
 
-        // Calcul hors-ligne
-        const now = Date.now();
-        const elapsedSeconds = (now - lastUpdate) / 1000;
-        balance += elapsedSeconds * (hashrate * 0.00001);
+        // Basculer Inscription / Connexion
+        function toggleAuthMode() {
+            isSignUp = !isSignUp;
+            document.getElementById('auth-subtitle').innerText = isSignUp ? "Créer un compte pour commencer" : "Connectez-vous pour commencer à miner";
+            document.getElementById('auth-submit-btn').innerText = isSignUp ? "S'inscrire" : "Se Connecter";
+            document.getElementById('auth-toggle-btn').innerText = isSignUp ? "Déjà un compte ? Se connecter" : "Pas encore de compte ? S'inscrire";
+            document.getElementById('auth-msg').innerText = "";
+        }
 
-        // --- ÉLÉMENTS DOM ---
-        const balanceEl = document.getElementById('balance');
-        const hashrateEl = document.getElementById('hashrate');
-        const rateEl = document.getElementById('rate');
-        const refInput = document.getElementById('ref-link');
-        const msgEl = document.getElementById('message');
+        // Simuler la Connexion / Inscription
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const msgEl = document.getElementById('auth-msg');
 
-        // Générer le lien de parrainage
-        refInput.value = `${window.location.origin}?ref=${userId}`;
+            if (password.length < 6) {
+                msgEl.className = "text-xs mb-4 text-center text-red-400";
+                msgEl.innerText = "Le mot de passe doit contenir au moins 6 caractères.";
+                return;
+            }
 
-        // Mise à jour de la boucle de minage
+            // Enregistrer la session utilisateur
+            currentUser = { email: email, id: 'usr_' + Math.random().toString(36).substring(2, 9) };
+            localStorage.setItem('doge_session', JSON.stringify(currentUser));
+
+            msgEl.className = "text-xs mb-4 text-center text-green-400";
+            msgEl.innerText = isSignUp ? "Compte créé avec succès !" : "Connexion réussie !";
+
+            setTimeout(() => {
+                showDashboard();
+            }, 600);
+        }
+
+        function showDashboard() {
+            document.getElementById('auth-card').classList.add('hidden');
+            document.getElementById('dashboard-card').classList.remove('hidden');
+            document.getElementById('user-email-display').innerText = currentUser.email;
+            document.getElementById('ref-link').value = `${window.location.origin}?ref=${currentUser.id}`;
+
+            // Charger les données utilisateur
+            hashrate = parseFloat(localStorage.getItem(`hashrate_${currentUser.email}`)) || 15.5;
+            balance = parseFloat(localStorage.getItem(`balance_${currentUser.email}`)) || 10.000000;
+            completedTasks = JSON.parse(localStorage.getItem(`tasks_${currentUser.email}`)) || [];
+
+            completedTasks.forEach(id => updateTaskUI(id));
+
+            // Démarrer la boucle de minage
+            if (!miningInterval) {
+                miningInterval = setInterval(updateMining, 100);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('doge_session');
+            clearInterval(miningInterval);
+            miningInterval = null;
+            location.reload();
+        }
+
         function updateMining() {
             const ratePerSec = hashrate * 0.00001;
             balance += ratePerSec / 10;
             
-            balanceEl.innerText = balance.toFixed(6);
-            hashrateEl.innerText = hashrate.toFixed(1);
-            rateEl.innerText = ratePerSec.toFixed(6);
+            document.getElementById('balance').innerText = balance.toFixed(6);
+            document.getElementById('hashrate').innerText = hashrate.toFixed(1);
+            document.getElementById('rate').innerText = ratePerSec.toFixed(6);
 
-            localStorage.setItem('doge_balance', balance.toString());
-            localStorage.setItem('doge_hashrate', hashrate.toString());
-            localStorage.setItem('doge_last_update', Date.now().toString());
+            localStorage.setItem(`balance_${currentUser.email}`, balance.toString());
+            localStorage.setItem(`hashrate_${currentUser.email}`, hashrate.toString());
         }
 
-        setInterval(updateMining, 100);
-
-        // --- GESTION DES TÂCHES ---
-        function completeTask(taskId, bonusHashrate) {
+        function completeTask(taskId, bonus) {
             if (completedTasks.includes(taskId)) return;
-
-            hashrate += bonusHashrate;
+            hashrate += bonus;
             completedTasks.push(taskId);
-            localStorage.setItem('doge_tasks', JSON.stringify(completedTasks));
-
+            localStorage.setItem(`tasks_${currentUser.email}`, JSON.stringify(completedTasks));
             updateTaskUI(taskId);
         }
 
@@ -150,21 +217,18 @@
             }
         }
 
-        // Restaurer l'état des tâches complétées au chargement
-        completedTasks.forEach(id => updateTaskUI(id));
-
-        // --- PARRAINAGE ---
         function copyRefLink() {
+            const refInput = document.getElementById('ref-link');
             refInput.select();
             navigator.clipboard.writeText(refInput.value);
-            alert("Lien d'affiliation copié !");
+            alert("Lien de parrainage copié !");
         }
 
-        // --- RETRAIT ---
         function handleWithdraw(e) {
             e.preventDefault();
             const wallet = document.getElementById('wallet').value;
             const amount = parseFloat(document.getElementById('amount').value);
+            const msgEl = document.getElementById('withdraw-msg');
 
             if (amount > balance) {
                 msgEl.className = "text-xs mt-2 text-center text-red-400";
@@ -173,11 +237,15 @@
             }
 
             balance -= amount;
-            localStorage.setItem('doge_balance', balance.toString());
-            
+            localStorage.setItem(`balance_${currentUser.email}`, balance.toString());
             msgEl.className = "text-xs mt-2 text-center text-green-400";
-            msgEl.innerText = `✅ Demande de ${amount} DOGE enregistrée !`;
+            msgEl.innerText = `✅ Retrait de ${amount} DOGE envoyé !`;
             document.getElementById('withdraw-form').reset();
+        }
+
+        // Vérifier si une session est déjà active au chargement
+        if (currentUser) {
+            showDashboard();
         }
     </script>
 </body>
