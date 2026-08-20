@@ -59,9 +59,11 @@
                 <h1 class="text-xl md:text-2xl font-bold text-yellow-400">🐕 DogeMiner</h1>
             </div>
 
+            <!-- MENU DESKTOP -->
             <div class="hidden md:flex items-center gap-2">
                 <button onclick="showPage('page-mining')" class="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">⛏️ Tableau de Bord</button>
                 <button onclick="showPage('page-plans')" class="px-3 py-1.5 text-sm text-yellow-400 hover:text-yellow-300 rounded-lg hover:bg-gray-700/50 font-semibold transition cursor-pointer">⚡ Booster</button>
+                <button onclick="showPage('page-history')" class="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">📜 Historique</button>
                 <button onclick="showPage('page-referral')" class="px-3 py-1.5 text-sm text-gray-200 hover:text-yellow-400 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">🤝 Affiliation</button>
                 <button onclick="logout()" class="px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition cursor-pointer">🚪 Déconnexion</button>
             </div>
@@ -71,10 +73,11 @@
             </span>
         </div>
 
-        <!-- MENU LATÉRAL MOBILE -->
+        <!-- MENU LATÉRAL MOBILE (BURGER) -->
         <div id="side-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-gray-800/95 backdrop-blur-md border-b border-gray-700 p-4 space-y-2 z-50 shadow-2xl">
             <button onclick="showPage('page-mining')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">⛏️ Tableau de Bord</button>
             <button onclick="showPage('page-plans')" class="w-full text-left px-4 py-2 text-sm text-yellow-400 hover:bg-gray-700/60 rounded-lg flex items-center gap-2 font-semibold">⚡ Booster de Minage</button>
+            <button onclick="showPage('page-history')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">📜 Historique Transactions</button>
             <button onclick="showPage('page-referral')" class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700/60 rounded-lg flex items-center gap-2">🤝 Affiliation</button>
             <hr class="border-gray-700 my-2">
             <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2">🚪 Déconnexion</button>
@@ -199,7 +202,32 @@
             </div>
         </div>
 
-        <!-- PAGE 3 : AFFILIATION -->
+        <!-- PAGE 3 : HISTORIQUE DES TRANSACTIONS -->
+        <div id="page-history" class="page-content hidden space-y-4">
+            <div>
+                <h2 class="text-lg font-bold text-yellow-400">📜 Historique des Transactions</h2>
+                <p class="text-xs text-gray-400">Consultez vos derniers dépôts et vos demandes de retraits.</p>
+            </div>
+
+            <div class="bg-gray-900/60 rounded-xl border border-gray-700/50 overflow-x-auto">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-gray-800 text-gray-400 uppercase text-[10px] border-b border-gray-700">
+                        <tr>
+                            <th class="p-3">Type</th>
+                            <th class="p-3">Montant</th>
+                            <th class="p-3">Adresse / TXID</th>
+                            <th class="p-3">Date</th>
+                            <th class="p-3 text-right">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody" class="divide-y divide-gray-800">
+                        <!-- Données générées en JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAGE 4 : AFFILIATION -->
         <div id="page-referral" class="page-content hidden space-y-4">
             <div>
                 <h2 class="text-lg font-bold text-yellow-400">🤝 Programme d'Affiliation</h2>
@@ -249,7 +277,11 @@
         let balance = 10.0;
         let hashrate = 15.5;
 
-        // Variables de gestion de pack
+        // Historique local initial
+        let transactions = [
+            { type: "Inscription", amount: "+10.00 DOGE", detail: "Bonus de bienvenue", date: "Aujourd'hui", status: "Confirmé" }
+        ];
+
         let selectedPack = { name: "", doge: 0, usdt: 0 };
         let selectedCurrency = "DOGE";
 
@@ -333,6 +365,7 @@
             document.getElementById('dashboard-card').classList.remove('hidden');
             document.getElementById('ref-link').value = `${window.location.origin}?ref=${currentUser.id}`;
 
+            renderHistory();
             setInterval(updateMining, 100);
             setInterval(saveToCloud, 5000);
         }
@@ -362,11 +395,60 @@
             document.getElementById('side-menu').classList.add('hidden');
         }
 
+        // GESTION DE L'HISTORIQUE
+        function renderHistory() {
+            const tbody = document.getElementById('history-tbody');
+            if (transactions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Aucune transaction pour le moment.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = transactions.map(t => {
+                let statusColor = "text-yellow-400 bg-yellow-500/10 border-yellow-500/20";
+                if (t.status === "Confirmé") statusColor = "text-green-400 bg-green-500/10 border-green-500/20";
+                if (t.status === "Échoué") statusColor = "text-red-400 bg-red-500/10 border-red-500/20";
+
+                let typeColor = t.type.includes("Dépôt") ? "text-green-400" : (t.type.includes("Retrait") ? "text-red-400" : "text-yellow-400");
+
+                return `
+                    <tr class="hover:bg-gray-800/50 transition">
+                        <td class="p-3 font-semibold ${typeColor}">${t.type}</td>
+                        <td class="p-3 font-mono text-white">${t.amount}</td>
+                        <td class="p-3 font-mono text-[10px] text-gray-400 truncate max-w-[100px]">${t.detail}</td>
+                        <td class="p-3 text-[10px] text-gray-400">${t.date}</td>
+                        <td class="p-3 text-right">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] border ${statusColor}">${t.status}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function handleWithdraw(e) {
             e.preventDefault();
+            const wallet = document.getElementById('wallet').value;
+            const amount = parseFloat(document.getElementById('amount').value);
             const msg = document.getElementById('withdraw-msg');
-            msg.className = "text-xs mt-2 text-center text-red-400";
-            msg.innerText = "❌ Solde insuffisant pour procéder au retrait.";
+
+            if (balance < amount) {
+                msg.className = "text-xs mt-2 text-center text-red-400";
+                msg.innerText = "❌ Solde insuffisant pour procéder au retrait.";
+                return;
+            }
+
+            // Ajouter à l'historique
+            const today = new Date().toLocaleDateString('fr-FR');
+            transactions.unshift({
+                type: "Retrait",
+                amount: `-${amount.toFixed(2)} DOGE`,
+                detail: wallet,
+                date: today,
+                status: "En attente"
+            });
+
+            renderHistory();
+            msg.className = "text-xs mt-2 text-center text-yellow-400";
+            msg.innerText = "⌛ Demande de retrait enregistrée ! En cours de vérification.";
         }
 
         // DÉPÔT / ACHAT PACKS
@@ -423,10 +505,23 @@
             msg.innerText = "⌛ Vérification de la transaction sur la blockchain en cours...";
 
             setTimeout(() => {
+                const amountText = selectedCurrency === 'DOGE' ? `${selectedPack.doge} DOGE` : `${selectedPack.usdt} USDT`;
+                const today = new Date().toLocaleDateString('fr-FR');
+
+                transactions.unshift({
+                    type: "Dépôt " + selectedPack.name,
+                    amount: "+" + amountText,
+                    detail: txid,
+                    date: today,
+                    status: "En attente"
+                });
+
+                renderHistory();
+
                 msg.className = "text-xs text-center text-green-400 mt-2";
-                msg.innerText = "✅ Transaction soumise avec succès ! Votre mineur sera activé dès validation du réseau (1 à 3 confirmations).";
+                msg.innerText = "✅ Transaction soumise avec succès ! Rechargement visible dans votre Historique.";
                 document.getElementById('txid-input').value = "";
-            }, 2500);
+            }, 2000);
         }
 
         function copyRefLink() {
